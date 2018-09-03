@@ -57,6 +57,8 @@ orderby={
 ```offset=20```
 
 ## Example
+This example uses Slim Framework and converts a GET request into a database select query.
+
 ```php
 <?php
 
