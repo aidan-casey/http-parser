@@ -29,9 +29,9 @@ filter={
 }
 ```
 
-**Supported Filters**
+#### Supported Filters
 |Name|Key|Value|
-|---|---|---|
+|--|--|--|
 |Greater Than|$gt|Integer|
 |Greater Than or Equal To|$gte|Integer|
 |In|$in|Array|
