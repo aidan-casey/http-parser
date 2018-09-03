@@ -17,7 +17,7 @@ Coming soon! For now, feel free to clone this repository.
 |offset|SELECT|Integer|
 
 ### Fields
-``fields=ID, Name``
+```fields=ID, Name```
 
 ### Filter
 ```json
@@ -31,7 +31,7 @@ filter={
 
 **Supported Filters**
 |Name|Key|Value|
-|--|--|--|
+|---|---|---|
 |Greater Than|$gt|Integer|
 |Greater Than or Equal To|$gte|Integer|
 |In|$in|Array|
