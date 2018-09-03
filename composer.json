@@ -1,0 +1,25 @@
+{
+    "name": "aidan-casey/http-parser",
+    "description": "Various tools for parsing HTTP requests into API usable queries.",
+    "version": "v0.1.0",
+    "type": "library",
+    "autoload"      : {
+        "psr-4"     : {
+            "AidanCasey\\HttpParser\\": "src/"
+        }
+    },
+    "require": {
+        "zendframework/zend-db": "^2.9",
+        "psr/http-message": "^1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aidan Casey",
+            "email": "aidan.casey@anteris.com"
+        }
+    ],
+    "require-dev": {
+        "slim/slim": "^3.10"
+    }
+}
