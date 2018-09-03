@@ -32,15 +32,15 @@ filter={
 **Supported Filters**
 |Name|Key|Value|
 |--|--|--|
-| Greater Than | $gt | Integer |
-| Greater Than or Equal To| $gte | Integer |
-| In | $in | Array |
-| Not In | $nin | Array |
-| Like | $like | String |
-| Not Like | $nlike | String |
-| Less Than | $lt | Integer |
-| Less Than or Equal To | $lte | Integer |
-| Not | $not | String
+|Greater Than|$gt|Integer|
+|Greater Than or Equal To|$gte|Integer|
+|In|$in|Array|
+|Not In|$nin|Array|
+|Like|$like|String|
+|Not Like|$nlike|String|
+|Less Than|$lt|Integer|
+|Less Than or Equal To|$lte|Integer|
+|Not|$not|String|
 
 ### Order By
 ```json
