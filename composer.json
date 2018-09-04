@@ -1,7 +1,6 @@
 {
     "name": "aidan-casey/http-parser",
     "description": "Various tools for parsing HTTP requests into API usable queries.",
-    "version": "v0.1.0",
     "type": "library",
     "autoload"      : {
         "psr-4"     : {

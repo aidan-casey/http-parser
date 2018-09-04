@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.0] - 2018-09-04
+
+### Changed
+- composer.json to not include version so they will be read off branches.
+- CHANGLOG to include links.
+
 ## [1.0.0] - 2018-09-04
 
 ### Added
@@ -16,4 +22,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - UnsupportedRequestMethod for any unsupported request types.
 
 [Unreleased]: https://github.com/aidan-casey/http-parser/compare/v1.0.0...HEAD
+[1.1.0]: https://github.com/aidan-casey/http-parser/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/aidan-casey/http-parser/releases/tag/v1.0.0
