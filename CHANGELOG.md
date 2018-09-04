@@ -14,3 +14,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - CONTRIBUTING for contributing guidelines.
 - HttpToZend class for conversion of request parameters to database statements.
 - UnsupportedRequestMethod for any unsupported request types.
+
+[Unreleased]: https://github.com/aidan-casey/http-parser/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/aidan-casey/http-parser/releases/tag/v1.0.0
