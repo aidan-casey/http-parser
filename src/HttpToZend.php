@@ -4,6 +4,7 @@ namespace AidanCasey\HttpParser;
 
 use AidanCasey\HttpParser\Exception\UnsupportedRequestMethod;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Db\Sql\AbstractPreparableSql;
 use Zend\Db\Sql\Delete;
 use Zend\Db\Sql\Update;
 use Zend\Db\Sql\Select;
@@ -33,10 +34,6 @@ class HttpToZend
         if ( $Request->isDelete() )
         {
             $Query = new Delete();
-            
-            $Query->where(
-                $this->_RequestParseFilter( $Request )
-            );
         }
 
         // Setup a GET method.
@@ -44,32 +41,16 @@ class HttpToZend
         {
             $Query = new Select();
 
-            $Query
-                ->columns(
-                    $this->_RequestParseFields( $Request )
-                )
-                ->where(
-                    $this->_RequestParseFilter( $Request )
-                )
-                ->order(
-                    $this->_RequestParseOrderBy( $Request )
-                )
-                ->limit(
-                    $this->_RequestParseLimit( $Request )
-                )
-                ->offset(
-                    $this->_RequestParseOffset( $Request )
-                );
+            $this->_QueryAddFields( $Request, $Query );
+            $this->_QueryAddOrderBy( $Request, $Query );
+            $this->_QueryAddLimit( $Request, $Query );
+            $this->_QueryAddOffset( $Request, $Query );
         }
 
         // Setup an update method (PATCH or PUT).
         if ( $Request->isPatch() || $Request->isPut() )
         {
             $Query = new Update();
-
-            $Query->where(
-                $this->_RequestParseFilter( $Request )
-            );
         }
 
         // If there's no query, throw an exception.
@@ -81,40 +62,41 @@ class HttpToZend
                 . ' method.'
             );
         }
+        
+        // This method is acceptable for all types.
+        $this->_QueryAddFilters( $Request, $Query );
 
-        // Otherwise return the query we've put together.
+        // Now return the query we've put together.
         return $Query;
     }
 
     /**
-     * Parses fields from the request object.
+     * Parses fields from the request object and adds it to the query.
      *
      * @param   ServerRequestInterface  $Request The current HTTP request.
-     *
-     * @return  array   An array of fields to return.
      *
      * @author  Aidan Casey <aidan.casey@anteris.com>
      * @since   v0.1.0
      */
-    protected function _RequestParseFields ( ServerRequestInterface $Request )
+    protected function _QueryAddFields ( ServerRequestInterface $Request, AbstractPreparableSql &$Query )
     {
-        return explode(
-            ',',
-            $Request->getQueryParam( 'fields', '*' )
+        $Query->columns(
+            explode(
+                ',',
+                $Request->getQueryParam( 'fields', '*' )
+            )
         );
     }
 
     /**
-     * Parses filters from the request object.
+     * Parses filters from the request object and adds them to the query.
      *
      * @param   ServerRequestInterface  $Request The current HTTP request.
-     *
-     * @return  Where   Zend Framework WHERE object.
      *
      * @author  Aidan Casey <aidan.casey@anteris.com>
      * @since   v0.1.0
      */
-    protected function _RequestParseFilter ( ServerRequestInterface $Request )
+    protected function _QueryAddFilters ( ServerRequestInterface $Request, AbstractPreparableSql &$Query )
     {
         // First get the filter parameter.
         $Filter = json_decode(
@@ -122,13 +104,14 @@ class HttpToZend
             True
         );
 
-        // Now add any filters we've got.
-        $Where  = new Where();
-
+        // If there are no filters, don't waste time.
         if (! $Filter )
         {
-            return $Where;
+            return;
         }
+
+        // Now add any filters we've got.
+        $Where  = new Where();
 
         // Look at each filter and determine
         // it's query.
@@ -197,50 +180,54 @@ class HttpToZend
             // End of foreach.
         }
 
-        return $Where;
+        $Query->where( $Where );
     }
 
     /**
-     * Parses limit statements from the request object.
+     * Parses limits from the request object and adds them to the query.
      *
      * @param   ServerRequestInterface  $Request The current HTTP request.
-     *
-     * @return  integer     An integer suitable for Zend DB.
      *
      * @author  Aidan Casey <aidan.casey@anteris.com>
      * @since   v0.1.0
      */
-    protected function _RequestParseLimit ( ServerRequestInterface $Request )
+    protected function _QueryAddLimit ( ServerRequestInterface $Request, AbstractPreparableSql &$Query )
     {
-        return $Request->getQueryParam( 'limit', 0 );
+        $Limit = $Request->getQueryParam( 'limit', null );
+
+        if (! is_null($Limit) )
+        {
+            $Query->limit( $Limit );
+        }
     }
 
     /**
-     * Parses offest statements from the request object.
+     * Parses offsets from the request object and adds them to the query.
      *
      * @param   ServerRequestInterface  $Request The current HTTP request.
-     *
-     * @return  integer     An integer suiteable for Zend DB.
      *
      * @author  Aidan Casey <aidan.casey@anteris.com>
      * @since   v0.1.0
      */
-    protected function _RequestParseOffset ( ServerRequestInterface $Request )
+    protected function _QueryAddOffset ( ServerRequestInterface $Request, AbstractPreparableSql &$Query )
     {
-        return $Request->getQueryParam( 'offset', 0 );
+        $Offset = $Request->getQueryParam( 'offset', null );
+
+        if (! is_null($Offset) )
+        {
+            $Query->offset( $Offset );
+        }
     }
 
     /**
-     * Parses orderby statements from the request object.
+     * Parses orderbys from the request object and adds them to the query.
      *
      * @param   ServerRequestInterface  $Request The current HTTP request.
-     *
-     * @return  array   An array of order by strings suitable for Zend DB.
      *
      * @author  Aidan Casey <aidan.casey@anteris.com>
      * @since   v0.1.0
      */
-    protected function _RequestParseOrderBy ( ServerRequestInterface $Request )
+    protected function _QueryAddOrderBy ( ServerRequestInterface $Request, AbstractPreparableSql &$Query )
     {
         // Decode the JSON format.
         $OrderBy        = json_decode(
@@ -252,7 +239,7 @@ class HttpToZend
         // If there's no orderby, stop here.
         if (! $OrderBy )
         {
-            return '';
+            return;
         }
 
         // This is so we can parse multiple orderby statements.
@@ -270,6 +257,7 @@ class HttpToZend
             $OrderByArray[] = "{$Column} {$Direction}";
         }
 
-        return $OrderByArray;
+        // Add it to the query!
+        $Query->order( $OrderByArray );
     }
 }

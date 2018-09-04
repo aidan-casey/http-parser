@@ -66,27 +66,44 @@ This example uses Slim Framework and converts a GET request into a database sele
 require_once 'vendor/autoload.php';
 
 // Start our Slim app.
-$App = new Slim\App();
+$App = new Slim\App([
+    'settings'  => [
+        'displayErrorDetails' => true
+    ]
+]);
 
-// Setup our API route.
-$App->get('/api/v1/me', function ( $Request, $Response ) use ( $App )
+// Add a database connection to our application container.
+$Container = $App->getContainer();
+
+$Container['DB'] = function ( $Container )
 {
-    // Setup our database connection.
-    $DB     = new Zend\Db\Adapter\Adapter([
+    // Setup our query adapter.
+    $Adapter = new Zend\Db\Adapter\Adapter([
         'database'  => 'Example',
         'driver'    => 'Mysqli',
         'host'      => 'localhost',
         'password'  => '',
-        'username'  => 'root'
+        'username'  => 'ExampleUser'
     ]);
-    $Table  = new Zend\Db\TableGateway\TableGateway( 'Table', $DB );
-    
+
+    // Now setup our sql object.
+    return new Zend\Db\Sql\Sql( $Adapter );
+};
+
+// Setup our API route.
+$App->get('/', function ( $Request, $Response ) use ( $Container )
+{
     // Parse any filters, etc.
     $Parser = new AidanCasey\HttpParser\HttpToZend();
     $Select = $Parser->ConvertHttpRequest( $Request );
     
-    // Run a query against the database.
-    $Result = $Table->selectWith( $Select );
+    // Prepare a query for the database.
+    $Statement  = $Container['DB']->prepareStatementForSqlObject(
+        $Select->from('ExampleTable')
+    );
+
+    // Now execute that query.
+    $Result     = $Statement->execute();
 });
 
 // Run our Slim app.
