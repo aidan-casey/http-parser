@@ -1,6 +1,6 @@
 <?php
 
-namespace AidanCasey\HttpParser\Middlware;
+namespace AidanCasey\HttpParser\Middleware;
 
 use AidanCasey\HttpParser\HttpToZend;
 use Psr\Http\Message\ResponseInterface;
