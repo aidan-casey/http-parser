@@ -28,7 +28,7 @@ class HttpToZend
      * @author  Aidan Casey <aidan.casey@anteris.com>
      * @since   v0.1.0
      */
-    public function ConvertHTTPRequest ( ServerRequestInterface $Request )
+    public function ConvertHttpRequest ( ServerRequestInterface $Request )
     {
         // Setup a DELETE method.
         if ( $Request->isDelete() )
